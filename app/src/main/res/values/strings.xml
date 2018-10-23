@@ -1,0 +1,25 @@
+<resources>
+    <string name="app_name">Popular Movies</string>
+    <string name="popular_movies">Popular Movies</string>
+    <string name="top_rated">Top Rated</string>
+    <string name="iv_row_item_description">Row item image view</string>
+    <string name="favourites">Favourites</string>
+    <string name="no_reviews_available">No Reviews available</string>
+    <string name="no_trailers_available">No Trailers available</string>
+    <string name="no_movies_here">No movies here !!</string>
+    <string name="overview">OVERVIEW</string>
+    <string name="trailers">TRAILERS</string>
+    <string name="reviews">REVIEWS</string>
+
+    <!--content description strings here-->
+
+    <string name="background_image">background image</string>
+    <string name="main_image">main image</string>
+    <string name="released_on_image">released on image</string>
+    <string name="rating_image">rating image</string>
+    <string name="scrim_item">scrim item</string>
+    <string name="trailer_thumbnail">trailer thumbnail</string>
+    <string name="play_icon">play icon</string>
+    <string name="initial_letter_image">initial letter image</string>
+
+</resources>
