@@ -55,7 +55,7 @@ import retrofit2.Response;
 public class DetailActivity extends AppCompatActivity {
 
 
-    private final String TRAILER_BASE_URL = "http://www.youtube.com/watch?v=";
+    private final static String TRAILER_BASE_URL = "http://www.youtube.com/watch?v=";
     private Context mContext;
     private static Reviews reviewModel;
     private MoviesResult moviesResultObject;
@@ -66,7 +66,6 @@ public class DetailActivity extends AppCompatActivity {
     private static int movieId;
     private static int position;
     private MoviesDatabase moviesDatabase;
-    private Observer observer;
     private MainViewModel mainViewModel;
 
     public @BindView(R.id.view_pager) ViewPager viewPager;
@@ -109,7 +108,6 @@ public class DetailActivity extends AppCompatActivity {
         movieId = getIntent().getIntExtra("movie_id" , -1);
 
         int color = getIntent().getIntExtra("back_color", 0 );
-        //   Toast.makeText(mContext, "" + color, Toast.LENGTH_SHORT).show();
         ivBackground.setBackgroundColor(color);
 
         if(movieId == -1 || MainActivity.nav_item_selected == -1){
@@ -123,7 +121,7 @@ public class DetailActivity extends AppCompatActivity {
 
         makeApiRequest();
 
-        observer = new Observer<MoviesResult>() {
+        Observer observer = new Observer<MoviesResult>() {
             @Override
             public void onChanged(@Nullable MoviesResult moviesResult) {
                 moviesResultObject = moviesResult;
@@ -363,6 +361,8 @@ public class DetailActivity extends AppCompatActivity {
             @Override
             public void onResponse(Call<MoviesResult> call, Response<MoviesResult> response) {
                 moviesResultObject = response.body();
+
+                ivBackground.setAlpha((float)1.0);
 
                 for (int i = 0; i < moviesInDatabaseList.size(); i++) {
                     if (Objects.equals(moviesResultObject.getId(), moviesInDatabaseList.get(i).getId())){

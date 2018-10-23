@@ -4,8 +4,8 @@ import android.app.ActivityOptions;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
 import android.support.v7.graphics.Palette;
 import android.support.v7.widget.RecyclerView;
@@ -22,8 +22,8 @@ import com.jain.tavish.popularmovies2.MainActivity;
 import com.jain.tavish.popularmovies2.ModelClasses.MoviesResult;
 import com.jain.tavish.popularmovies2.R;
 import com.squareup.picasso.Picasso;
+import com.squareup.picasso.Target;
 
-import java.net.URL;
 import java.util.List;
 
 import butterknife.BindView;
@@ -57,34 +57,62 @@ public class MovieAdapterHomeScreen extends RecyclerView.Adapter<MovieAdapterHom
         return new myViewHolder(v);
     }
 
-    private int getBackColor(String urlImage){
-        Bitmap bitmap = null;
-        final int[] vibrant = new int[1];
-
-        try {
-            URL url = new URL(urlImage);
-            bitmap = BitmapFactory.decodeStream(url.openConnection().getInputStream());
-        }catch (Exception e){
-            e.printStackTrace();
-        }
-
-        if (bitmap != null) {
-            Palette.from(bitmap).generate(new Palette.PaletteAsyncListener() {
-                public void onGenerated(Palette p) {
-                    vibrant[0] = p.getDominantColor(Color.WHITE);
-                    // Toast.makeText(mContext, "" + vibrant[0], Toast.LENGTH_SHORT).show();
-                    Log.e("tavish", "" + vibrant[0]);
-                }
-            });
-        }
-
-        return vibrant[0];
-
-    }
-
     @Override
     public void onBindViewHolder(@NonNull final myViewHolder holder, int position) {
         MoviesDatabase moviesDatabase = MoviesDatabase.getInstance(mContext);
+
+        final int[] vibrant = new int[1];
+
+        if(MainActivity.nav_item_selected == MainActivity.INT_POPULAR_MOVIES ||
+                MainActivity.nav_item_selected == MainActivity.INT_TOP_RATED_MOVIES) {
+            Picasso.get()
+                    .load("http://image.tmdb.org/t/p/w780/" + mResultList.get(position).getBackdropPath())
+                    .into(new Target() {
+                        @Override
+                        public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
+                            if (bitmap != null) {
+                                Palette.from(bitmap).generate(new Palette.PaletteAsyncListener() {
+                                    public void onGenerated(Palette p) {
+                                        vibrant[0] = p.getDominantColor(Color.WHITE);
+                                        Log.e("tavish", "from inside " + vibrant[0]);
+                                    }
+                                });
+                            }
+                        }
+
+                        @Override
+                        public void onBitmapFailed(Exception e, Drawable errorDrawable) {  }
+
+                        @Override
+                        public void onPrepareLoad(Drawable placeHolderDrawable) {   }
+                    });
+
+        }else if(MainActivity.nav_item_selected == MainActivity.INT_FAVOURITES){
+            if(moviesDatabase.moviesDao().getAllMovies().size() != 0) {
+               Picasso.get()
+                        .load("http://image.tmdb.org/t/p/w780/" +
+                                moviesDatabase.moviesDao().getAllMovies().get(position).getBackdropPath())
+                        .into(new Target() {
+                            @Override
+                            public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
+                                if (bitmap != null) {
+                                    Palette.from(bitmap).generate(new Palette.PaletteAsyncListener() {
+                                        public void onGenerated(Palette p) {
+                                            vibrant[0] = p.getDominantColor(Color.WHITE);
+                                            Log.e("tavish", "from inside " + vibrant[0]);
+                                        }
+                                    });
+                                }
+                            }
+
+                            @Override
+                            public void onBitmapFailed(Exception e, Drawable errorDrawable) { }
+
+                            @Override
+                            public void onPrepareLoad(Drawable placeHolderDrawable) {   }
+                        });
+            }
+        }
 
         holder.mImageView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -93,6 +121,9 @@ public class MovieAdapterHomeScreen extends RecyclerView.Adapter<MovieAdapterHom
                 Intent myIntent = new Intent(mContext, DetailActivity.class);
                 myIntent.putExtra("movie_id" , mResultList.get(holder.getAdapterPosition()).getId());
                 myIntent.putExtra("nav_item_selected" , MainActivity.nav_item_selected);
+
+                myIntent.putExtra("back_color", vibrant[0]);
+
                 ActivityOptions options =
                         ActivityOptions.makeCustomAnimation(mContext, R.anim.fade_in, R.anim.fade_out);
                 mContext.startActivity(myIntent, options.toBundle());
@@ -100,7 +131,8 @@ public class MovieAdapterHomeScreen extends RecyclerView.Adapter<MovieAdapterHom
             }
         });
 
-        if(MainActivity.nav_item_selected == MainActivity.INT_POPULAR_MOVIES || MainActivity.nav_item_selected == MainActivity.INT_TOP_RATED_MOVIES) {
+        if(MainActivity.nav_item_selected == MainActivity.INT_POPULAR_MOVIES ||
+                MainActivity.nav_item_selected == MainActivity.INT_TOP_RATED_MOVIES) {
             Picasso.get()
                     .load("http://image.tmdb.org/t/p/w780/" + mResultList.get(position).getBackdropPath())
                     //     .placeholder(R.drawable.loading)
@@ -111,7 +143,8 @@ public class MovieAdapterHomeScreen extends RecyclerView.Adapter<MovieAdapterHom
         }else if(MainActivity.nav_item_selected == MainActivity.INT_FAVOURITES){
             if(moviesDatabase.moviesDao().getAllMovies().size() != 0) {
                 Picasso.get()
-                        .load("http://image.tmdb.org/t/p/w780/" + moviesDatabase.moviesDao().getAllMovies().get(position).getBackdropPath())
+                        .load("http://image.tmdb.org/t/p/w780/" +
+                                moviesDatabase.moviesDao().getAllMovies().get(position).getBackdropPath())
                         //        .placeholder(R.drawable.loading)
                         .error(R.drawable.ic_error)
                         .into(holder.mImageView);
