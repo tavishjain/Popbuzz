@@ -8,6 +8,7 @@ import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -16,6 +17,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
@@ -111,15 +114,19 @@ public class DetailActivity extends AppCompatActivity {
         ivBackground.setBackgroundColor(color);
 
         if(movieId == -1 || MainActivity.nav_item_selected == -1){
-            Snackbar snackbar = Snackbar.make(frameLayout , "Error !!!!" , Snackbar.LENGTH_SHORT);
-            View snackBarView = snackbar.getView();
-            snackbar.setActionTextColor(Color.parseColor("#B0BEC5"));
-            snackBarView.setBackgroundColor(Color.parseColor("#202125"));
-            snackbar.show();
+            showSnackbar("Error !!!");
             finish();
         }
 
         makeApiRequest();
+
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                makeApiRequestForBackImage();
+            }
+        }, 1500);
+
 
         Observer observer = new Observer<MoviesResult>() {
             @Override
@@ -138,11 +145,8 @@ public class DetailActivity extends AppCompatActivity {
                 int i = 0;
                 do{
                     if(moviesInDatabaseList.size() == 0){
-                        Snackbar snackbar = Snackbar.make(frameLayout , "Movie added to Favourites" , Snackbar.LENGTH_SHORT);
-                        View snackBarView = snackbar.getView();
-                        snackbar.setActionTextColor(Color.parseColor("#B0BEC5"));
-                        snackBarView.setBackgroundColor(Color.parseColor("#202125"));
-                        snackbar.show();
+                        showSnackbar("Movie added to favourites !!!");
+
                         moviesDatabase.moviesDao().insertMovie(moviesResultObject);
                         moviesResultObject.setFavourite(true);
                         if(mainViewModel.getMoviesResults().getValue() != null) {
@@ -154,11 +158,8 @@ public class DetailActivity extends AppCompatActivity {
                     }
 
                     if(Objects.equals(moviesResultObject.getId(), moviesInDatabaseList.get(i).getId())){
-                        Snackbar snackbar = Snackbar.make(frameLayout , "Movie deleted from Favourites" , Snackbar.LENGTH_SHORT);
-                        View snackBarView = snackbar.getView();
-                        snackbar.setActionTextColor(Color.parseColor("#B0BEC5"));
-                        snackBarView.setBackgroundColor(Color.parseColor("#202125"));
-                        snackbar.show();
+                        showSnackbar("Movie deleted from favourites !!!");
+
                         moviesDatabase.moviesDao().deleteMovies(moviesResultObject);
                         moviesResultObject.setFavourite(false);
                         if(mainViewModel.getMoviesResults().getValue() != null) {
@@ -170,11 +171,8 @@ public class DetailActivity extends AppCompatActivity {
                     }
 
                     if(i == (moviesInDatabaseList.size() - 1)){
-                        Snackbar snackbar = Snackbar.make(frameLayout , "Movie added to Favourites" , Snackbar.LENGTH_SHORT);
-                        View snackBarView = snackbar.getView();
-                        snackbar.setActionTextColor(Color.parseColor("#B0BEC5"));
-                        snackBarView.setBackgroundColor(Color.parseColor("#202125"));
-                        snackbar.show();
+                        showSnackbar("Movie added to favourites !!!");
+
                         moviesDatabase.moviesDao().insertMovie(moviesResultObject);
                         moviesResultObject.setFavourite(true);
                         if(mainViewModel.getMoviesResults().getValue() != null) {
@@ -191,11 +189,22 @@ public class DetailActivity extends AppCompatActivity {
 
     }
 
+    public void showSnackbar(String message){
+        Snackbar snackbar = Snackbar.make(frameLayout , message , Snackbar.LENGTH_SHORT);
+        View snackBarView = snackbar.getView();
+        snackbar.setActionTextColor(Color.parseColor("#B0BEC5"));
+        snackBarView.setBackgroundColor(Color.parseColor("#202125"));
+        snackbar.show();
+    }
+
     @OnClick(R.id.fab_share_detail)
     public void shareBtnClick(){
         if(trailerResultList != null){
             trailerResultList.clear();
         }
+
+        showSnackbar("Loading sharing options for you !!!");
+
         ApiInterface apiInterface = RetrofitClient.getRetrofitInstance().create(ApiInterface.class);
         Call<Trailers> call = apiInterface.getMovieTrailers(Integer.toString(moviesResultObject.getId()), MainActivity.API_KEY);
         call.enqueue(new Callback<Trailers>() {
@@ -204,11 +213,7 @@ public class DetailActivity extends AppCompatActivity {
                 trailersModel = response.body();
                 trailerResultList.addAll(Objects.requireNonNull(trailersModel).getResults());
                 if(trailerResultList.size() == 0){
-                    Snackbar snackbar = Snackbar.make(frameLayout , "No Trailers available !!!" , Snackbar.LENGTH_SHORT);
-                    View snackBarView = snackbar.getView();
-                    snackbar.setActionTextColor(Color.parseColor("#B0BEC5"));
-                    snackBarView.setBackgroundColor(Color.parseColor("#202125"));
-                    snackbar.show();
+                    showSnackbar("No Trailers available !!!");
                 } else {
                     sendIntent(trailerResultList.get(0).getKey());
                 }
@@ -216,11 +221,7 @@ public class DetailActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(Call<Trailers> call, Throwable t) {
-                Snackbar snackbar = Snackbar.make(frameLayout , "Connect to the Internet !!!" , Snackbar.LENGTH_SHORT);
-                View snackBarView = snackbar.getView();
-                snackbar.setActionTextColor(Color.parseColor("#B0BEC5"));
-                snackBarView.setBackgroundColor(Color.parseColor("#202125"));
-                snackbar.show();
+                showSnackbar("Connect to the Internet !!!");
             }
         });
     }
@@ -351,6 +352,60 @@ public class DetailActivity extends AppCompatActivity {
         }
     }
 
+    private void makeApiRequestForBackImage(){
+        ApiInterface apiInterface = RetrofitClient.getRetrofitInstance().create(ApiInterface.class);
+        Call<MoviesResult> callResult = apiInterface.getMovieDetailsById
+                (Integer.toString(movieId) , MainActivity.API_KEY);
+
+        callResult.enqueue(new Callback<MoviesResult>() {
+            @Override
+            public void onResponse(Call<MoviesResult> call, Response<MoviesResult> response) {
+                moviesResultObject = response.body();
+
+                ivBackground.setAlpha((float)1.0);
+
+                Target target = new Target() {
+                    @Override
+                    public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
+
+                        Animation fadeIn = AnimationUtils.loadAnimation(DetailActivity.this, R.anim.fade_in);
+                        ivBackground.startAnimation(fadeIn);
+
+
+                        ivBackground.setImageBitmap(BlurImage.fastblur(bitmap, 1f, 80));
+                    }
+
+                    @Override
+                    public void onBitmapFailed(Exception e, Drawable errorDrawable) {
+
+                    }
+
+                    @Override
+                    public void onPrepareLoad(Drawable placeHolderDrawable) {
+
+                    }
+                };
+
+                ivBackground.setTag(target);
+                Picasso.get()
+                        .load("http://image.tmdb.org/t/p/w500/" + moviesResultObject.getBackdropPath())
+                        .error(R.drawable.ic_error)
+                        //       .placeholder(R.drawable.loading)
+                        .into(target);
+            }
+
+            @Override
+            public void onFailure(Call<MoviesResult> call, Throwable t) {
+                showSnackbar("Connect to the Internet !!!");
+
+                Picasso.get()
+                        .load("http://image.tmdb.org/t/p/w780/" + moviesInDatabaseList.get(position).getBackdropPath())
+                        //          .placeholder(R.drawable.loading)
+                        .error(R.drawable.ic_error)
+                        .into(ivBackground);
+            }
+        });
+    }
 
     private void makeApiRequest(){
         ApiInterface apiInterface = RetrofitClient.getRetrofitInstance().create(ApiInterface.class);
@@ -392,30 +447,29 @@ public class DetailActivity extends AppCompatActivity {
 
                 overview.setText(moviesResultObject.getOverview());
 
-                Target target = new Target() {
-                    @Override
-                    public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
-                        ivBackground.setImageBitmap(BlurImage.fastblur(bitmap, 1f, 80));
-                    }
-
-                    @Override
-                    public void onBitmapFailed(Exception e, Drawable errorDrawable) {
-
-                    }
-
-                    @Override
-                    public void onPrepareLoad(Drawable placeHolderDrawable) {
-
-                    }
-                };
-
-                ivBackground.setTag(target);
-                Picasso.get()
-                        .load("http://image.tmdb.org/t/p/w780/" + moviesResultObject.getBackdropPath())
-                        .error(R.drawable.ic_error)
-                        //       .placeholder(R.drawable.loading)
-                        .into(target);
-
+//                Target target = new Target() {
+//                    @Override
+//                    public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
+//                        ivBackground.setImageBitmap(BlurImage.fastblur(bitmap, 1f, 80));
+//                    }
+//
+//                    @Override
+//                    public void onBitmapFailed(Exception e, Drawable errorDrawable) {
+//
+//                    }
+//
+//                    @Override
+//                    public void onPrepareLoad(Drawable placeHolderDrawable) {
+//
+//                    }
+//                };
+//
+//                ivBackground.setTag(target);
+//                Picasso.get()
+//                        .load("http://image.tmdb.org/t/p/w780/" + moviesResultObject.getBackdropPath())
+//                        .error(R.drawable.ic_error)
+//                        //       .placeholder(R.drawable.loading)
+//                        .into(target);
 
                 Picasso.get()
                         .load("http://image.tmdb.org/t/p/w500/" + moviesResultObject.getPosterPath())
@@ -431,11 +485,8 @@ public class DetailActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(Call<MoviesResult> call, Throwable t) {
-                Snackbar snackbar = Snackbar.make(frameLayout , "Connect to the Internet !!!" , Snackbar.LENGTH_SHORT);
-                View snackBarView = snackbar.getView();
-                snackbar.setActionTextColor(Color.parseColor("#B0BEC5"));
-                snackBarView.setBackgroundColor(Color.parseColor("#202125"));
-                snackbar.show();
+                showSnackbar("Connect to the Internet !!!");
+
                 DecimalFormat precision = new DecimalFormat("0.0");
                 rating.setText("Rating : " + precision.format(moviesInDatabaseList.get(position).getRating()) + " / 10");
                 dateReleased.setText(moviesInDatabaseList.get(position).getReleaseDate());

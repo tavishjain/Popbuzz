@@ -1,15 +1,17 @@
 package com.jain.tavish.popularmovies2.Adapters;
 
-import android.app.ActivityOptions;
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityOptionsCompat;
+import android.support.v4.util.Pair;
+import android.support.v4.view.ViewCompat;
 import android.support.v7.graphics.Palette;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -74,7 +76,6 @@ public class MovieAdapterHomeScreen extends RecyclerView.Adapter<MovieAdapterHom
                                 Palette.from(bitmap).generate(new Palette.PaletteAsyncListener() {
                                     public void onGenerated(Palette p) {
                                         vibrant[0] = p.getDominantColor(Color.WHITE);
-                                        Log.e("tavish", "from inside " + vibrant[0]);
                                     }
                                 });
                             }
@@ -99,7 +100,6 @@ public class MovieAdapterHomeScreen extends RecyclerView.Adapter<MovieAdapterHom
                                     Palette.from(bitmap).generate(new Palette.PaletteAsyncListener() {
                                         public void onGenerated(Palette p) {
                                             vibrant[0] = p.getDominantColor(Color.WHITE);
-                                            Log.e("tavish", "from inside " + vibrant[0]);
                                         }
                                     });
                                 }
@@ -121,11 +121,12 @@ public class MovieAdapterHomeScreen extends RecyclerView.Adapter<MovieAdapterHom
                 Intent myIntent = new Intent(mContext, DetailActivity.class);
                 myIntent.putExtra("movie_id" , mResultList.get(holder.getAdapterPosition()).getId());
                 myIntent.putExtra("nav_item_selected" , MainActivity.nav_item_selected);
-
                 myIntent.putExtra("back_color", vibrant[0]);
 
-                ActivityOptions options =
-                        ActivityOptions.makeCustomAnimation(mContext, R.anim.fade_in, R.anim.fade_out);
+                Pair<View, String> p1 = Pair.create((View)holder.mImageView, ViewCompat.getTransitionName(holder.mImageView));
+
+                ActivityOptionsCompat options = ActivityOptionsCompat.makeSceneTransitionAnimation((Activity)mContext, p1);
+
                 mContext.startActivity(myIntent, options.toBundle());
 
             }

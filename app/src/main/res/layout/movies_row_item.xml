@@ -7,6 +7,7 @@
     <ImageView
         android:id="@+id/row_item_iv"
         android:layout_width="match_parent"
+        android:transitionName="imageTransitionName"
         android:layout_height="242dp"
         android:scaleType="centerCrop"
         android:contentDescription="@string/iv_row_item_description"/>
@@ -24,6 +25,7 @@
         android:maxLines="2"
         android:layout_gravity="bottom|start"
         android:layout_marginStart="16dp"
+        android:transitionName="movieNameTransitionName"
         android:textStyle="bold"
         android:layout_marginEnd="90dp"
         android:layout_marginBottom="16dp"

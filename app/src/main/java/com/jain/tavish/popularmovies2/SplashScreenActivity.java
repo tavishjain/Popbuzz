@@ -6,7 +6,11 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityOptionsCompat;
+import android.support.v4.util.Pair;
+import android.support.v4.view.ViewCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.view.View;
 import android.view.ViewTreeObserver;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -21,9 +25,22 @@ public class SplashScreenActivity extends AppCompatActivity {
     private Runnable runnable = new Runnable() {
         @Override public void run() {
             Intent intent = new Intent(SplashScreenActivity.this , MainActivity.class);
-            finish();
-            overridePendingTransition(R.anim.enter, R.anim.exit);
-            startActivity(intent);
+
+            Pair<View, String> p1 = Pair.create((View)mAppNameView, ViewCompat.getTransitionName(mAppNameView));
+            ActivityOptionsCompat options = ActivityOptionsCompat.makeSceneTransitionAnimation(SplashScreenActivity.this, p1);
+            startActivity(intent, options.toBundle());
+         //   finish();
+
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    finish();
+                }
+            }, 1500);
+
+
+
+
         }
     };
 

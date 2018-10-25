@@ -1,6 +1,5 @@
 package com.jain.tavish.popularmovies2;
 
-import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Parcelable;
@@ -16,6 +15,7 @@ import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.jain.tavish.popularmovies2.Adapters.MovieAdapterHomeScreen;
 import com.jain.tavish.popularmovies2.Database.MoviesDatabase;
@@ -190,16 +190,13 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         if (doubleBackToExitPressedOnce) {
-            super.onBackPressed();
+            finish();
             return;
         }
 
         this.doubleBackToExitPressedOnce = true;
-        Snackbar snackbar = Snackbar.make(relativeLayout , "Please click BACK again to exit" , Snackbar.LENGTH_SHORT);
-        View snackBarView = snackbar.getView();
-        snackbar.setActionTextColor(Color.parseColor("#B0BEC5"));
-        snackBarView.setBackgroundColor(Color.parseColor("#202125"));
-        snackbar.show();
+
+        Toast.makeText(this, "Please click BACK again to exit", Toast.LENGTH_SHORT).show();
 
         new Handler().postDelayed(new Runnable() {
 
