@@ -16,6 +16,7 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
@@ -248,21 +249,24 @@ public class DetailActivity extends AppCompatActivity {
                 trailerResultList.addAll(Objects.requireNonNull(trailersModel).getResults());
                 viewPager.setPageMargin(20);
                 trailersBar.setVisibility(View.GONE);
+                Log.e("tavish", "progress bar gone");
 
                 if (trailerResultList.size() == 0) {
                     viewPager.setVisibility(View.GONE);
                     noTrailerTv.setVisibility(View.VISIBLE);
+                    Log.e("tavish", "1");
                 } else {
                     TrailerAdapter adapter = new TrailerAdapter(DetailActivity.this ,trailerResultList);
                     viewPager.setAdapter(adapter);
                     viewPager.setVisibility(View.VISIBLE);
                     noTrailerTv.setVisibility(View.GONE);
+                    adapter.notifyDataSetChanged();
                 }
             }
 
             @Override
             public void onFailure(Call<Trailers> call, Throwable t) {
-
+                showSnackbar("Failed to load Trailers");
             }
         });
     }
