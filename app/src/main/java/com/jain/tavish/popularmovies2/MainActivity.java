@@ -50,7 +50,7 @@ public class MainActivity extends AppCompatActivity {
     public @BindView(R.id.tv_toolbar) TextView tv_toolbar;
 
     private Call<Movies> call;
-    public static final String API_KEY = "b0cb77ae989f5a61434edb0bc96792dc";
+    public static final String API_KEY = "";
     private Movies mMovieModel;
     private List<MoviesResult> moviesResultList;
     private MovieAdapterHomeScreen adapter;

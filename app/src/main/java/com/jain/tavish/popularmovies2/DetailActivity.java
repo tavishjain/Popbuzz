@@ -451,30 +451,6 @@ public class DetailActivity extends AppCompatActivity {
 
                 overview.setText(moviesResultObject.getOverview());
 
-//                Target target = new Target() {
-//                    @Override
-//                    public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
-//                        ivBackground.setImageBitmap(BlurImage.fastblur(bitmap, 1f, 80));
-//                    }
-//
-//                    @Override
-//                    public void onBitmapFailed(Exception e, Drawable errorDrawable) {
-//
-//                    }
-//
-//                    @Override
-//                    public void onPrepareLoad(Drawable placeHolderDrawable) {
-//
-//                    }
-//                };
-//
-//                ivBackground.setTag(target);
-//                Picasso.get()
-//                        .load("http://image.tmdb.org/t/p/w780/" + moviesResultObject.getBackdropPath())
-//                        .error(R.drawable.ic_error)
-//                        //       .placeholder(R.drawable.loading)
-//                        .into(target);
-
                 Picasso.get()
                         .load("http://image.tmdb.org/t/p/w500/" + moviesResultObject.getPosterPath())
                         //    .placeholder(R.drawable.loading)
