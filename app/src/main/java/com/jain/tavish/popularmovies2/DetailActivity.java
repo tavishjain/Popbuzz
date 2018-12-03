@@ -9,6 +9,7 @@ import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.PersistableBundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -235,6 +236,20 @@ public class DetailActivity extends AppCompatActivity {
         startActivity(sendIntent);
     }
 
+    @Override
+    public void onSaveInstanceState(Bundle outState){
+        outState.putInt("trailerBarVisibilityStatus", trailersBar.getVisibility());
+        outState.putInt("reviewBarVisibilityStatus", reviewsBar.getVisibility());
+        super.onSaveInstanceState(outState);
+    }
+
+    @Override
+    public void onRestoreInstanceState(Bundle savedInstanceState) {
+        trailersBar.setVisibility(savedInstanceState.getInt("trailerBarVisibilityStatus"));
+        reviewsBar.setVisibility(savedInstanceState.getInt("reviewBarVisibilityStatus"));
+        super.onRestoreInstanceState(savedInstanceState);
+    }
+
     private void loadTrailers(){
         if(trailerResultList != null){
             trailerResultList.clear();
@@ -249,18 +264,16 @@ public class DetailActivity extends AppCompatActivity {
                 trailerResultList.addAll(Objects.requireNonNull(trailersModel).getResults());
                 viewPager.setPageMargin(20);
                 trailersBar.setVisibility(View.GONE);
-                Log.e("tavish", "progress bar gone");
 
-                if (trailerResultList.size() == 0) {
+                if (trailerResultList.size() == 0 || trailerResultList == null) {
                     viewPager.setVisibility(View.GONE);
                     noTrailerTv.setVisibility(View.VISIBLE);
-                    Log.e("tavish", "1");
                 } else {
-                    TrailerAdapter adapter = new TrailerAdapter(DetailActivity.this ,trailerResultList);
-                    viewPager.setAdapter(adapter);
-                    viewPager.setVisibility(View.VISIBLE);
-                    noTrailerTv.setVisibility(View.GONE);
-                    adapter.notifyDataSetChanged();
+                        TrailerAdapter adapter = new TrailerAdapter(DetailActivity.this ,trailerResultList);
+                        noTrailerTv.setVisibility(View.GONE);
+                        viewPager.setVisibility(View.VISIBLE);
+                        viewPager.setAdapter(adapter);
+                        adapter.notifyDataSetChanged();
                 }
             }
 
@@ -322,8 +335,8 @@ public class DetailActivity extends AppCompatActivity {
 
                 ReviewsAdapter reviewsAdapter = new ReviewsAdapter(DetailActivity.this, nameList, reviewList);
                 recyclerViewReviews.setHasFixedSize(true);
-                recyclerViewReviews.setLayoutManager(new LinearLayoutManager(DetailActivity.this));
                 recyclerViewReviews.setAdapter(reviewsAdapter);
+                recyclerViewReviews.setLayoutManager(new LinearLayoutManager(DetailActivity.this));
             }
 
             @Override
@@ -374,7 +387,6 @@ public class DetailActivity extends AppCompatActivity {
 
                         Animation fadeIn = AnimationUtils.loadAnimation(DetailActivity.this, R.anim.fade_in);
                         ivBackground.startAnimation(fadeIn);
-
 
                         ivBackground.setImageBitmap(BlurImage.fastblur(bitmap, 1f, 80));
                     }

@@ -10,6 +10,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ProgressBar;
@@ -50,7 +51,7 @@ public class MainActivity extends AppCompatActivity {
     public @BindView(R.id.tv_toolbar) TextView tv_toolbar;
 
     private Call<Movies> call;
-    public static final String API_KEY = "";
+    public static final String API_KEY = "b0cb77ae989f5a61434edb0bc96792dc";
     private Movies mMovieModel;
     private List<MoviesResult> moviesResultList;
     private MovieAdapterHomeScreen adapter;
@@ -166,7 +167,8 @@ public class MainActivity extends AppCompatActivity {
                 }else {
                     progressBar.setVisibility(View.GONE);
                     Snackbar snackbar = Snackbar
-                            .make(relativeLayout, "Failed Loading List", Snackbar.LENGTH_SHORT);
+                            .make(relativeLayout, "Failed Loading List ", Snackbar.LENGTH_SHORT);
+
                     snackbar.show();
                 }
             }
