@@ -6,23 +6,20 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
-import android.graphics.Movie;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.PersistableBundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -31,7 +28,6 @@ import android.widget.Toast;
 import com.jain.tavish.popularmovies2.Adapters.ReviewsAdapter;
 import com.jain.tavish.popularmovies2.Adapters.TrailerAdapter;
 import com.jain.tavish.popularmovies2.Database.MoviesDatabase;
-import com.jain.tavish.popularmovies2.ModelClasses.Movies;
 import com.jain.tavish.popularmovies2.ModelClasses.MoviesResult;
 import com.jain.tavish.popularmovies2.ModelClasses.Reviews;
 import com.jain.tavish.popularmovies2.ModelClasses.ReviewsResult;
@@ -83,7 +79,7 @@ public class DetailActivity extends AppCompatActivity {
     public @BindView(R.id.tv_date_released_detail) TextView dateReleased;
     public @BindView(R.id.tv_rating_detail) TextView rating;
     public @BindView(R.id.tv_overview_detail) TextView overview;
-    public @BindView(R.id.frame_layout) FrameLayout frameLayout;
+    public @BindView(R.id.coordinator_layout) CoordinatorLayout coordinatorLayout;
     public @BindView(R.id.fab_share_detail) FloatingActionButton shareFAB;
     public @BindView(R.id.fab_fav_detail) FloatingActionButton floatingActionButton;
     public @BindView(R.id.pb_reviews) ProgressBar reviewsBar;
@@ -175,7 +171,7 @@ public class DetailActivity extends AppCompatActivity {
     }
 
     public void showSnackbar(String message){
-        Snackbar snackbar = Snackbar.make(frameLayout , message , Snackbar.LENGTH_SHORT);
+        Snackbar snackbar = Snackbar.make(coordinatorLayout, message , Snackbar.LENGTH_SHORT);
         View snackBarView = snackbar.getView();
         snackbar.setActionTextColor(Color.parseColor("#B0BEC5"));
         snackBarView.setBackgroundColor(Color.parseColor("#202125"));
@@ -390,7 +386,6 @@ public class DetailActivity extends AppCompatActivity {
 
                 Picasso.get()
                         .load("http://image.tmdb.org/t/p/w780/" + moviesInDatabaseList.get(position).getBackdropPath())
-                        //          .placeholder(R.drawable.loading)
                         .error(R.drawable.ic_error)
                         .into(ivBackground);
             }

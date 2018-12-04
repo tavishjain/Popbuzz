@@ -5,6 +5,7 @@ import android.os.Handler;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
@@ -13,6 +14,7 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.FrameLayout;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -147,6 +149,10 @@ public class MainActivity extends AppCompatActivity {
                 }else{
                     Snackbar snackbar = Snackbar
                             .make(relativeLayout, "mMovieModel is null", Snackbar.LENGTH_SHORT);
+                    FrameLayout.LayoutParams params = (FrameLayout.LayoutParams)
+                            snackbar.getView().getLayoutParams();
+                    params.setMargins(0, 0, 0, bottomNavigationView.getHeight());
+                    snackbar.getView().setLayoutParams(params);
                     snackbar.show();
                 }
 
@@ -168,6 +174,10 @@ public class MainActivity extends AppCompatActivity {
                     progressBar.setVisibility(View.GONE);
                     Snackbar snackbar = Snackbar
                             .make(relativeLayout, "Failed Loading List ", Snackbar.LENGTH_SHORT);
+                    FrameLayout.LayoutParams params = (FrameLayout.LayoutParams)
+                            snackbar.getView().getLayoutParams();
+                    params.setMargins(0, 0, 0, bottomNavigationView.getHeight());
+                    snackbar.getView().setLayoutParams(params);
 
                     snackbar.show();
                 }
