@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Popular Movies</string>
+    <string name="app_name">PopBuzz</string>
     <string name="popular_movies">Popular Movies</string>
     <string name="top_rated">Top Rated</string>
     <string name="iv_row_item_description">Row item image view</string>
