@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.graphics.Movie;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
@@ -30,6 +31,7 @@ import android.widget.Toast;
 import com.jain.tavish.popularmovies2.Adapters.ReviewsAdapter;
 import com.jain.tavish.popularmovies2.Adapters.TrailerAdapter;
 import com.jain.tavish.popularmovies2.Database.MoviesDatabase;
+import com.jain.tavish.popularmovies2.ModelClasses.Movies;
 import com.jain.tavish.popularmovies2.ModelClasses.MoviesResult;
 import com.jain.tavish.popularmovies2.ModelClasses.Reviews;
 import com.jain.tavish.popularmovies2.ModelClasses.ReviewsResult;
@@ -127,7 +129,7 @@ public class DetailActivity extends AppCompatActivity {
             public void run() {
                 makeApiRequestForBackImage();
             }
-        }, 1500);
+        }, 2000);
 
 
         Observer observer = new Observer<MoviesResult>() {
@@ -143,49 +145,30 @@ public class DetailActivity extends AppCompatActivity {
         floatingActionButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                moviesInDatabaseList = moviesDatabase.moviesDao().getAllMovies();
-                int i = 0;
-                do{
-                    if(moviesInDatabaseList.size() == 0){
-                        showSnackbar("Movie added to favourites !!!");
+                boolean favMovie = moviesDatabase.moviesDao().loadMovieById(Integer.toString(movieId));
+                if(!favMovie){
+                    //this movie is not in favourites
+                    showSnackbar("Movie added to favourites !!!");
 
-                        moviesDatabase.moviesDao().insertMovie(moviesResultObject);
-                        moviesResultObject.setFavourite(true);
-                        if(mainViewModel.getMoviesResults().getValue() != null) {
-                            mainViewModel.getMoviesResults().getValue().setFavourite(true);
-                        }
-                        moviesDatabase.moviesDao().updateMovie(moviesResultObject);
-                        setAppropriateFabImage();
-                        break;
+                    moviesDatabase.moviesDao().insertMovie(moviesResultObject);
+                    moviesResultObject.setFavourite(true);
+                    if(mainViewModel.getMoviesResults().getValue() != null) {
+                        mainViewModel.getMoviesResults().getValue().setFavourite(true);
                     }
+                    moviesDatabase.moviesDao().updateMovie(moviesResultObject);
+                    setAppropriateFabImage();
+                }else {
+                    //this movie is in favourites
+                    showSnackbar("Movie deleted from favourites !!!");
 
-                    if(Objects.equals(moviesResultObject.getId(), moviesInDatabaseList.get(i).getId())){
-                        showSnackbar("Movie deleted from favourites !!!");
-
-                        moviesDatabase.moviesDao().deleteMovies(moviesResultObject);
-                        moviesResultObject.setFavourite(false);
-                        if(mainViewModel.getMoviesResults().getValue() != null) {
-                            mainViewModel.getMoviesResults().getValue().setFavourite(false);
-                        }
-                        moviesDatabase.moviesDao().updateMovie(moviesResultObject);
-                        setAppropriateFabImage();
-                        break;
+                    moviesDatabase.moviesDao().deleteMovies(moviesResultObject);
+                    moviesResultObject.setFavourite(false);
+                    if(mainViewModel.getMoviesResults().getValue() != null) {
+                        mainViewModel.getMoviesResults().getValue().setFavourite(false);
                     }
-
-                    if(i == (moviesInDatabaseList.size() - 1)){
-                        showSnackbar("Movie added to favourites !!!");
-
-                        moviesDatabase.moviesDao().insertMovie(moviesResultObject);
-                        moviesResultObject.setFavourite(true);
-                        if(mainViewModel.getMoviesResults().getValue() != null) {
-                            mainViewModel.getMoviesResults().getValue().setFavourite(true);
-                        }
-                        moviesDatabase.moviesDao().updateMovie(moviesResultObject);
-                        setAppropriateFabImage();
-                        break;
-                    }
-                    i++;
-                }while (i < moviesInDatabaseList.size());
+                    moviesDatabase.moviesDao().updateMovie(moviesResultObject);
+                    setAppropriateFabImage();
+                }
             }
         });
 
@@ -262,7 +245,6 @@ public class DetailActivity extends AppCompatActivity {
                 trailersModel = response.body();
 
                 trailerResultList.addAll(Objects.requireNonNull(trailersModel).getResults());
-                viewPager.setPageMargin(20);
                 trailersBar.setVisibility(View.GONE);
 
                 if (trailerResultList.size() == 0 || trailerResultList == null) {
@@ -272,6 +254,7 @@ public class DetailActivity extends AppCompatActivity {
                         TrailerAdapter adapter = new TrailerAdapter(DetailActivity.this ,trailerResultList);
                         noTrailerTv.setVisibility(View.GONE);
                         viewPager.setVisibility(View.VISIBLE);
+                        viewPager.setPageMargin(20);
                         viewPager.setAdapter(adapter);
                         adapter.notifyDataSetChanged();
                 }
@@ -353,20 +336,12 @@ public class DetailActivity extends AppCompatActivity {
     }
 
     private void setAppropriateFabImage(){
-        for (int i = 0; i < moviesDatabase.moviesDao().getAllMovies().size(); i++) {
-            if(Objects.equals(moviesResultObject.getId(), moviesDatabase.moviesDao().getAllMovies().get(i).getId())){
-                position = i;
-                break;
-            }else{
-                position = -1;
-            }
-        }
-
-        if(position >=0){
-            floatingActionButton.setImageResource(R.drawable.ic_fav);
-        }else{
-            floatingActionButton.setImageResource(R.drawable.ic_unfav);
-        }
+       boolean favMovie = moviesDatabase.moviesDao().loadMovieById(Integer.toString(movieId));
+       if(favMovie == false){
+           floatingActionButton.setImageResource(R.drawable.ic_unfav);
+       }else{
+           floatingActionButton.setImageResource(R.drawable.ic_fav);
+       }
     }
 
     private void makeApiRequestForBackImage(){
@@ -406,7 +381,6 @@ public class DetailActivity extends AppCompatActivity {
                 Picasso.get()
                         .load("http://image.tmdb.org/t/p/w500/" + moviesResultObject.getBackdropPath())
                         .error(R.drawable.ic_error)
-                        //       .placeholder(R.drawable.loading)
                         .into(target);
             }
 
