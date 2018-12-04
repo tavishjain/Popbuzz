@@ -385,7 +385,7 @@ public class DetailActivity extends AppCompatActivity {
                 showSnackbar("Connect to the Internet !!!");
 
                 Picasso.get()
-                        .load("http://image.tmdb.org/t/p/w780/" + moviesInDatabaseList.get(position).getBackdropPath())
+                        .load("http://image.tmdb.org/t/p/w500/" + moviesInDatabaseList.get(position).getBackdropPath())
                         .error(R.drawable.ic_error)
                         .into(ivBackground);
             }
