@@ -7,3 +7,6 @@ Also, you can add movies to favourites so that you can have a look at them later
 
 #Splash Screen
 ![alt text](https://raw.githubusercontent.com/tavishjain/Popbuzz/master/Screenshots/screener_1546764305567.png= 278X500)
+
+
+<img src="https://raw.githubusercontent.com/tavishjain/Popbuzz/master/Screenshots/screener_1546764305567.png" alt="alt text" width="278" height="500">
