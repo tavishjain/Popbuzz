@@ -59,9 +59,6 @@ public class MainActivity extends AppCompatActivity {
     public @BindView(R.id.tv_fav_zero) TextView tv_fav_zero;
     public @BindView(R.id.tv_toolbar) TextView tv_toolbar;
 
-    //TODO issues
-    //TODO 1. trailers wala issue
-
     private Observable<Movies> observable;
     public static final String API_KEY = "";
     private Movies mMovieModel;

@@ -26,6 +26,7 @@ import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 
 import java.util.List;
+import java.util.Objects;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -64,55 +65,35 @@ public class MovieAdapterHomeScreen extends RecyclerView.Adapter<MovieAdapterHom
         MoviesDatabase moviesDatabase = MoviesDatabase.getInstance(mContext);
 
         final int[] vibrant = new int[1];
-
+        MoviesResult item = null;
         if(MainActivity.nav_item_selected == MainActivity.INT_POPULAR_MOVIES ||
                 MainActivity.nav_item_selected == MainActivity.INT_TOP_RATED_MOVIES) {
-            Picasso.get()
-                    .load("http://image.tmdb.org/t/p/w780/" + mResultList.get(position).getBackdropPath())
-                    .into(new Target() {
-                        @Override
-                        public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
-                            if (bitmap != null) {
-                                Palette.from(bitmap).generate(new Palette.PaletteAsyncListener() {
-                                    public void onGenerated(Palette p) {
-                                        vibrant[0] = p.getDominantColor(Color.WHITE);
-                                    }
-                                });
-                            }
-                        }
-
-                        @Override
-                        public void onBitmapFailed(Exception e, Drawable errorDrawable) {  }
-
-                        @Override
-                        public void onPrepareLoad(Drawable placeHolderDrawable) {   }
-                    });
-
+            item = mResultList.get(position);
         }else if(MainActivity.nav_item_selected == MainActivity.INT_FAVOURITES){
-            if(moviesDatabase.moviesDao().getAllMovies().size() != 0) {
-               Picasso.get()
-                        .load("http://image.tmdb.org/t/p/w780/" +
-                                moviesDatabase.moviesDao().getAllMovies().get(position).getBackdropPath())
-                        .into(new Target() {
-                            @Override
-                            public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
-                                if (bitmap != null) {
-                                    Palette.from(bitmap).generate(new Palette.PaletteAsyncListener() {
-                                        public void onGenerated(Palette p) {
-                                            vibrant[0] = p.getDominantColor(Color.WHITE);
-                                        }
-                                    });
-                                }
-                            }
-
-                            @Override
-                            public void onBitmapFailed(Exception e, Drawable errorDrawable) { }
-
-                            @Override
-                            public void onPrepareLoad(Drawable placeHolderDrawable) {   }
-                        });
-            }
+            item = moviesDatabase.moviesDao().getAllMovies().get(position);
         }
+
+        Picasso.get()
+                .load("http://image.tmdb.org/t/p/w780/" + Objects.requireNonNull(item).getBackdropPath())
+                .into(new Target() {
+                    @Override
+                    public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
+                        if (bitmap != null) {
+                            Palette.from(bitmap).generate(new Palette.PaletteAsyncListener() {
+                                    public void onGenerated(Palette p) {
+                                    vibrant[0] = p.getDominantColor(Color.WHITE);
+                                }
+                            });
+                        }
+                    }
+
+                    @Override
+                    public void onBitmapFailed(Exception e, Drawable errorDrawable) {  }
+
+                    @Override
+                    public void onPrepareLoad(Drawable placeHolderDrawable) {   }
+                });
+
 
         holder.mImageView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -132,29 +113,18 @@ public class MovieAdapterHomeScreen extends RecyclerView.Adapter<MovieAdapterHom
             }
         });
 
-        if(MainActivity.nav_item_selected == MainActivity.INT_POPULAR_MOVIES ||
-                MainActivity.nav_item_selected == MainActivity.INT_TOP_RATED_MOVIES) {
+        if(moviesDatabase.moviesDao().getAllMovies().size() == 0){
+            tv_fav_zero.setVisibility(View.VISIBLE);
+        }else{
             Picasso.get()
-                    .load("http://image.tmdb.org/t/p/w780/" + mResultList.get(position).getBackdropPath())
+                    .load("http://image.tmdb.org/t/p/w780/" + item.getBackdropPath())
                     //     .placeholder(R.drawable.loading)
                     .error(R.drawable.ic_error)
                     .into(holder.mImageView);
-            holder.movieName.setText(mResultList.get(position).getTitle());
-            holder.rating.setText(mResultList.get(position).getRating().toString());
-        }else if(MainActivity.nav_item_selected == MainActivity.INT_FAVOURITES){
-            if(moviesDatabase.moviesDao().getAllMovies().size() != 0) {
-                Picasso.get()
-                        .load("http://image.tmdb.org/t/p/w780/" +
-                                moviesDatabase.moviesDao().getAllMovies().get(position).getBackdropPath())
-                        //        .placeholder(R.drawable.loading)
-                        .error(R.drawable.ic_error)
-                        .into(holder.mImageView);
-                holder.movieName.setText(moviesDatabase.moviesDao().getAllMovies().get(position).getTitle());
-                holder.rating.setText(moviesDatabase.moviesDao().getAllMovies().get(position).getRating().toString());
-            }else if(moviesDatabase.moviesDao().getAllMovies().size() == 0){
-                tv_fav_zero.setVisibility(View.VISIBLE);
-            }
+            holder.movieName.setText(item.getTitle());
+            holder.rating.setText(item.getRating().toString());
         }
+
     }
     @Override
     public int getItemCount() {
